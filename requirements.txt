@@ -1,0 +1,4 @@
+nextcord
+ruamel.yaml
+python-dotenv
+pymongo
