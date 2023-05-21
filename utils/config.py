@@ -1,6 +1,4 @@
 from ruamel.yaml import YAML
-from dotenv import load_dotenv
-import os
 
 file_paths = ['data/config.yml']
 data = {}
@@ -14,3 +12,4 @@ for file_path in file_paths:
 prefix = data['prefix']
 main_guild = data['main_guild']
 owner_id = data['owner_id']
+embed_color = data['embed_color']
