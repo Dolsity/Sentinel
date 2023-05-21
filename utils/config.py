@@ -1,6 +1,4 @@
 from ruamel.yaml import YAML
-from dotenv import load_dotenv
-import os
 
 file_paths = ['data/config.yml']
 data = {}
