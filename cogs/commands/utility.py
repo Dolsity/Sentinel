@@ -1,19 +1,13 @@
 from nextcord.ext import commands
 import nextcord
 from nextcord import Interaction
-import os
-import aiohttp
-from PIL import Image
-import random
-import os
-import asyncio
 from utils.config import embed_color, owner_id
 
 class Utility(commands.Cog, name="Utility", description="Utility Commands"):
     def __init__(self, bot):
         self.bot = bot
     
-    COG_EMOJI = "⚒️"
+    COG_EMOJI = "🔨"
 
     @commands.command(name="ping")
     async def command_ping(self, interaction : Interaction):
