@@ -1,2 +1,2 @@
 # Sentinel
- The best Discord bot, created for Fora support
+ The best Discord bot, created for Fora support.
