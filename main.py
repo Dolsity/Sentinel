@@ -2,7 +2,8 @@ import nextcord
 from nextcord.ext import commands
 import os
 from extensions import initial_extensions
-from utils.config import prefix, main_guild, owner_id
+from dotenv import load_dotenv
+from utils.config import prefix
 
 
 class Bot(commands.Bot):
