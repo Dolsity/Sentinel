@@ -10,9 +10,9 @@ class Moderation(commands.Cog, name="Moderation", description="Moderation Comman
     
     COG_EMOJI = "⚒️"
 
-    @commands.command(name="blacklist", aliases=["bl"])
+    @commands.command(name="warn")
     async def command_blacklist_user(self, interaction : Interaction, user : nextcord.Member = None, *, reason : str = None):
-        """Blacklist a user from using the bot"""
+        """Warn a user"""
         await interaction.trigger_typing()
 
         if interaction.author.id not in owner_id:
@@ -50,9 +50,10 @@ class Moderation(commands.Cog, name="Moderation", description="Moderation Comman
             await interaction.send(embed=embed)
             return
         
-        if user == user.bot:
+        # check if user is a bot
+        if user.bot:
             embed = nextcord.Embed(
-                title=":x: Error", description="You can't blacklist a bot.", color=embed_error_color
+                title=":x: Error", description="You can't blacklist bots.", color=embed_error_color
             )
             await interaction.send(embed=embed)
             return

@@ -2,6 +2,7 @@ from typing import Optional, Set
 from nextcord.ext import commands
 from nextcord import Embed
 import nextcord
+from utils.config import embed_color
 
 class HelpDropdown(nextcord.ui.Select):
     def __init__(self, help_command: "MyHelpCommand", options: list[nextcord.SelectOption]):
@@ -60,7 +61,7 @@ class MyHelpCommand(commands.MinimalHelpCommand):
         self, title: str, description: Optional[str] = None, mapping: Optional[str] = None,
         command_set: Optional[Set[commands.Command]] = None, set_author: bool = False
     ) -> Embed:
-        embed = Embed(title=title, color=0x9c24f2)
+        embed = Embed(title=title, color=embed_color)
         #embed.set_footer(text="This is the footer of the embed")
         if description:
             embed.description = description
