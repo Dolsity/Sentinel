@@ -11,5 +11,7 @@ for file_path in file_paths:
 
 prefix = data['prefix']
 main_guild = data['main_guild']
+logging_channel = data['logging_channel']
 owner_id = data['owner_id']
 embed_color = data['embed_color']
+embed_error_color = data['embed_error_color']

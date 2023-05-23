@@ -2,7 +2,8 @@ import nextcord
 from nextcord.ext import commands
 import os
 from extensions import initial_extensions
-from utils.config import prefix, main_guild, owner_id
+from dotenv import load_dotenv
+from utils.config import prefix
 
 
 class Bot(commands.Bot):
@@ -24,7 +25,9 @@ class Bot(commands.Bot):
     
     async def on_ready(self):
         print(f"Logged in as {self.user.name} - {self.user.id}")
-        await self.change_presence(activity=nextcord.Activity(type=nextcord.ActivityType.watching, name=f"{self.prefix}help"))
+        await self.change_presence(
+            status=nextcord.Status.dnd, activity=nextcord.Activity(type=nextcord.ActivityType.watching, name=f"{len(list(self.get_all_members()))} Users")
+        )
 
 intents = nextcord.Intents.default()
 intents.members = True
@@ -42,4 +45,5 @@ if __name__ == '__main__':
         bot.load_extension(extension)
 
 
+load_dotenv()
 bot.run(os.getenv('TOKEN'), reconnect=True)

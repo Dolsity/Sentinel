@@ -1,19 +1,13 @@
 from nextcord.ext import commands
 import nextcord
 from nextcord import Interaction
-import os
-import aiohttp
-from PIL import Image
-import random
-import os
-import asyncio
 from utils.config import embed_color, owner_id
 
 class Utility(commands.Cog, name="Utility", description="Utility Commands"):
     def __init__(self, bot):
         self.bot = bot
     
-    COG_EMOJI = "⚒️"
+    COG_EMOJI = "🔨"
 
     @commands.command(name="ping")
     async def command_ping(self, interaction : Interaction):
@@ -40,9 +34,18 @@ class Utility(commands.Cog, name="Utility", description="Utility Commands"):
         embed.set_author(
             name=self.bot.user.name, icon_url=self.bot.user.display_avatar
         )
+
+        # mention the owners
+        if isinstance(owner_id, list):
+            owners = [self.bot.get_user(user_id) for user_id in owner_id]
+            owners = [owner.mention for owner in owners]
+            owners = ", ".join(owners)
+        else:
+            owners = self.bot.get_user(owner_id).mention
+
         embed.add_field(
             name="Information", 
-            value=f"**» Developer:** <@{owner_id}>\n", inline=False
+            value=f"**» Developer:** {owners}\n", inline=False
         )
         embed.add_field(
             name="Statistics",
