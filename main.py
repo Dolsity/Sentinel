@@ -25,7 +25,9 @@ class Bot(commands.Bot):
     
     async def on_ready(self):
         print(f"Logged in as {self.user.name} - {self.user.id}")
-        await self.change_presence(activity=nextcord.Activity(type=nextcord.ActivityType.watching, name=f"{self.prefix}help"))
+        await self.change_presence(
+            status=nextcord.Status.dnd, activity=nextcord.Activity(type=nextcord.ActivityType.watching, name=f"{len(list(self.get_all_members()))} Users")
+        )
 
 intents = nextcord.Intents.default()
 intents.members = True
