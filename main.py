@@ -4,7 +4,7 @@ import os
 from extensions import initial_extensions
 from dotenv import load_dotenv
 
-from fnmatch import fnmatch
+import fnmatch
 
 from utils.config import prefix
 
@@ -59,7 +59,7 @@ if __name__ == '__main__':
                     try:
                         bot.load_extension(path_f)
                         print(f"Loaded {path_f}")
-                    except nextcord.ext.commands.errors.NoEntryPointError:  # Checks if the cog has a setup function
+                    except commands.errors.NoEntryPointError:  # Checks if the cog has a setup function
                         pass
 
 
