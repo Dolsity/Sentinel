@@ -2,12 +2,13 @@ import aiohttp
 import nextcord
 from nextcord.ext import commands
 from nextcord.utils import format_dt
-
 from datetime import datetime
 from io import BytesIO
 from typing import List, Union
-
 from utils.config import logging_channel, main_guild, embed_color
+from utils.database import warnings, blacklist
+from PIL import Image, ImageFont, ImageDraw
+from easy_pil import Editor, load_image_async
 
 
 class Logging(commands.Cog):
@@ -19,19 +20,72 @@ class Logging(commands.Cog):
 
         if member.guild.id != main_guild:
             return
-
+    
         channel = member.guild.get_channel(logging_channel)
 
         embed = nextcord.Embed(title="Member joined")
+        embed.description=""
         embed.color = embed_color
+
+        await member.add_roles(member.guild.get_role(891573857255829515)) # Member role
+
+        if warnings.find_one({"_id": member.id}):
+            count = len(warnings.find_one({"_id": member.id}).get('reason', []))
+            embed.description+=f"**{member.display_name} has {count} warnings.**"
+            embed.color = nextcord.Color.orange()
+
+        if blacklist.find_one({"_id": member.id}):
+            await member.add_roles(member.guild.get_role(1110810158105374750)) # Blacklist role
+            embed.description+=f"\n**{member.display_name} is blacklisted.**"
+            embed.color = nextcord.Color.red()
+
         embed.set_thumbnail(url=member.display_avatar)
         embed.add_field( name="User", value=f'{member} ({member.mention})', inline=True)
-        embed.add_field(name="Join date", value=f"{format_dt(member.joined_at, style='F')} ({format_dt(member.joined_at, style='R')})", inline=True)
-        embed.add_field(name="Created", value=f"{format_dt(member.created_at, style='F')} ({format_dt(member.created_at, style='R')})", inline=True)
+        embed.add_field(name="Joined Server", value=f"{format_dt(member.joined_at, style='R')}", inline=True)
+        embed.add_field(name="Joined Discord", value=f"{format_dt(member.created_at, style='R')}", inline=True)
         embed.timestamp = datetime.now()
         embed.set_footer(text=member.id)
-
         await channel.send(embed=embed)
+
+        image = Image.new("RGB", (800, 450), color="#8b7af4")
+        name_text_font = ImageFont.truetype("assets/fonts/RedHatText-MediumItalic.otf", 40)
+        guild_text_font = ImageFont.truetype("assets/fonts/RedHatText-MediumItalic.otf", 25)
+        draw = ImageDraw.Draw(image)
+
+        background_image = Image.new("RGBA", (750, 400), color="#6859c9")
+        image.paste(background_image, (25, 25))
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(str(member.display_avatar)) as response:
+                avatar_bytes = await response.read()
+
+        avatar_image = Image.open(BytesIO(avatar_bytes)).convert("RGBA").resize((200, 200))
+        avatar_image = avatar_image.resize((200, 200))
+        avatar_mask = Image.new("L", avatar_image.size, 0)
+        draw_avatar_mask = ImageDraw.Draw(avatar_mask)
+        draw_avatar_mask.ellipse((0, 0) + avatar_image.size, fill=255)
+        avatar_image.putalpha(avatar_mask)
+        image.paste(avatar_image, (300, 70), avatar_image)
+
+        if len(member.display_name) > 10:
+            member.display_name = member.display_name[:10] + "..."
+        if len(member.guild.name) > 13:
+            member.guild.name = member.guild.name[:13] + "..."
+        name_text = f"Welcome {member.display_name} to {member.guild.name}"
+        guild_text = f"You are the member #{len(member.guild.members)}"
+        name_text_width, name_text_height = draw.textsize(name_text, font=name_text_font)
+        guild_text_width, guild_text_height = draw.textsize(guild_text, font=guild_text_font)
+        draw.text(((800 - name_text_width) / 2, (650 - name_text_height) / 2), name_text, font=name_text_font, fill="#ffffff")
+        draw.text(((800 - guild_text_width) / 2, (740 - guild_text_height) / 2), guild_text, font=guild_text_font, fill="#ffffff")
+
+        with BytesIO() as image_binary:
+            image.save(image_binary, format='PNG')
+            image_binary.seek(0)
+
+            file = nextcord.File(fp=image_binary, filename="card.png")
+
+        channel = member.guild.get_channel(1110823809587617833)
+        await channel.send(f"👋 Welcome, {member.mention}.\n", file=file)
 
 
     @commands.Cog.listener()
@@ -115,7 +169,7 @@ class Logging(commands.Cog):
 
         if len(message.content) > 400:
             content = content[0:400] + "..."
-        embed.add_field(name="Message", value=content + f"\n\n[Link to message]({message.jump_url})", inline=False)
+        embed.add_field(name="Message", value=content, inline=False)
 
         embed.set_footer(text=message.author.id)
         embed.timestamp = datetime.now()
@@ -248,6 +302,9 @@ class Logging(commands.Cog):
         embed.set_footer(text=member.id)
 
         async for action in member.guild.audit_logs(limit=1, action=nextcord.AuditLogAction.member_role_update):
+            # Check if bot gave user role, if so return
+            if action.user.id == self.bot.user.id:
+                return
             if action.target.id == member.id:
                 embed.add_field(name="Updated by", value=f'{action.user} ({action.user.mention})', inline=False)
 

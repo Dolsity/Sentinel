@@ -14,7 +14,6 @@ class Bot(commands.Bot):
 
     async def process_commands(self, message):
         if not self.is_ready():
-            await message.channel.send("I'm not ready to process commands yet. Please wait a few seconds.")
             return
 
         ctx = await self.get_context(message, cls=commands.Context)

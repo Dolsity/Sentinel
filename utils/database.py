@@ -4,17 +4,18 @@ import datetime
 import os
 
 load_dotenv()
-
-def get_fora_database():
-    fora_db = MongoClient(os.getenv('MONGO_URI'))['Fora']
-    return fora_db
-
+get_fora_database = MongoClient(os.getenv('MONGO_URI'))['Fora']
+blacklist = get_fora_database["blacklist"]
+get_sentinel_database = MongoClient(os.getenv('MONGO_URI'))['Sentinel']
+warnings = get_sentinel_database["warnings"]
+kicks = get_sentinel_database["kicks"]
+bans = get_sentinel_database["bans"]
 
 def blacklist_user_add(user_id: int, author_id: int, reason: str):
     """
-    Adds a user to the blacklist
+    Adds a user to the Fora blacklist
     """
-    get_fora_database()["blacklist"].insert_one({
+    get_fora_database["blacklist"].insert_one({
         "_id": user_id, 
         "time": str(datetime.date.today()),
         "author_id": author_id,
@@ -24,13 +25,13 @@ def blacklist_user_add(user_id: int, author_id: int, reason: str):
 
 def blacklist_user_remove(user_id: int):
     """
-    Removes a user from the blacklist
+    Removes a user from the Fora blacklist
     """
-    get_fora_database()["blacklist"].delete_one({"_id": user_id})
+    get_fora_database["blacklist"].delete_one({"_id": user_id})
 
 
 def blacklist_user_get(user_id: int):
     """
-    Returns a user from the blacklist
+    Returns a user from the Fora blacklist
     """
-    return get_fora_database()["blacklist"].find_one({"_id": user_id})
+    return get_fora_database["blacklist"].find_one({"_id": user_id})
