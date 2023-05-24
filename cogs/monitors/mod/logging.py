@@ -115,7 +115,7 @@ class Logging(commands.Cog):
 
         if len(message.content) > 400:
             content = content[0:400] + "..."
-        embed.add_field(name="Message", value=content + f"\n\n[Link to message]({message.jump_url})", inline=False)
+        embed.add_field(name="Message", value=content, inline=False)
 
         embed.set_footer(text=message.author.id)
         embed.timestamp = datetime.now()
