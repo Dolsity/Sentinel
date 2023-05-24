@@ -8,7 +8,6 @@ from typing import List, Union
 from utils.config import logging_channel, main_guild, embed_color
 from utils.database import warnings, blacklist
 from PIL import Image, ImageFont, ImageDraw
-from easy_pil import Editor, load_image_async
 
 
 class Logging(commands.Cog):
