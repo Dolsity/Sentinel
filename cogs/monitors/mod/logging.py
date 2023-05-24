@@ -71,7 +71,7 @@ class Logging(commands.Cog):
         if len(member.guild.name) > 13:
             member.guild.name = member.guild.name[:13] + "..."
         name_text = f"Welcome {member.display_name} to {member.guild.name}"
-        guild_text = f"You are the member #{len(member.guild.members)}"
+        guild_text = f"You are member #{len(member.guild.members)}"
         name_text_width, name_text_height = draw.textsize(name_text, font=name_text_font)
         guild_text_width, guild_text_height = draw.textsize(guild_text, font=guild_text_font)
         draw.text(((800 - name_text_width) / 2, (650 - name_text_height) / 2), name_text, font=name_text_font, fill="#ffffff")
