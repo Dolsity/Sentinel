@@ -2,3 +2,4 @@ nextcord
 ruamel.yaml
 python-dotenv
 pymongo
+Pillow
