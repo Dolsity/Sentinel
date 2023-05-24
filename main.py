@@ -1,11 +1,8 @@
 import nextcord
 from nextcord.ext import commands
 import os
-from extensions import initial_extensions
 from dotenv import load_dotenv
-
 import fnmatch
-
 from utils.config import prefix
 
 
@@ -42,18 +39,16 @@ mentions = nextcord.AllowedMentions(everyone=False, users=True, roles=False)
 bot = Bot(command_prefix=prefix, intents=intents, allowed_mentions=mentions, case_insensitive=True)
 
 
-
 if __name__ == '__main__':
-    
-    disabled_cogs = []  # A list of cogs that you don't want to load | ex. ["cogs.mod.fora", "cogs.mod.moderation"]
-    
+    disabled_cogs = []
+
     folder = "./cogs"
     ending = "*.py"
-    
+
     for path, subdirs, files in os.walk(folder):
         for name in files:
-            if fnmatch.fnmatch(name, ending):  # Checks if the file is a python file
-                paths = path.join(path, name)[2:][:-3]  # Formats the path to the file to be able to load it
+            if fnmatch.fnmatch(name, ending):  # Checks if the file is a Python file
+                paths = os.path.join(path, name)[2:][:-3]  # Formats the path to the file to be able to load it
                 path_f = paths.replace("/", ".")
                 if not path_f.split(".")[-1] in disabled_cogs:  # Checks if the cog is disabled
                     try:
@@ -61,7 +56,6 @@ if __name__ == '__main__':
                         print(f"Loaded {path_f}")
                     except commands.errors.NoEntryPointError:  # Checks if the cog has a setup function
                         pass
-
 
 load_dotenv()
 bot.run(os.getenv('TOKEN'), reconnect=True)
