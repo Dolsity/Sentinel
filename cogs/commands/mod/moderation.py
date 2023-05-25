@@ -12,6 +12,47 @@ class Moderation(commands.Cog, name="Moderation", description="Moderation Comman
     
     COG_EMOJI = "🛠"
 
+    # Create a purge command
+    @commands.command(name="purge")
+    async def command_purge(self, interaction : Interaction, amount : int = None):
+        """Purge messages"""
+        await interaction.trigger_typing()
+
+        if interaction.author.id not in owner_id:
+            embed = nextcord.Embed(
+                title=":x: Error", description="You're not the owner of this bot.", color=embed_error_color
+            )
+            await interaction.send(embed=embed)
+            return
+        
+        if amount is None:
+            embed = nextcord.Embed(
+                title=":x: Error", description="Please specify an amount of messages to purge.", color=embed_error_color
+            )
+            await interaction.send(embed=embed)
+            return
+        
+        if amount > 100:
+            embed = nextcord.Embed(
+                title=":x: Error", description="You can't purge more than 100 messages.", color=embed_error_color
+            )
+            await interaction.send(embed=embed)
+            return
+        
+        if amount < 1:
+            embed = nextcord.Embed(
+                title=":x: Error", description="You can't purge less than 1 message.", color=embed_error_color
+            )
+            await interaction.send(embed=embed)
+            return
+        
+        amount = len(await interaction.channel.purge(limit=amount))
+        embed = nextcord.Embed(
+            title=":white_check_mark: Success", description=f"Purged {amount} messages.", color=embed_color
+        )
+        await interaction.send(embed=embed)
+
+
     @commands.command(name="warn")
     async def command_warn_user(self, interaction : Interaction, user : nextcord.Member = None, *, reason : str = None):
         """Warn a user"""
