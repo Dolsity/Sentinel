@@ -16,7 +16,7 @@ class Bot(commands.Bot):
         if not self.is_ready():
             return
         
-        if message.author.dm_channel:
+        if message.guild is None:
             return
         
         ctx = await self.get_context(message, cls=commands.Context)
