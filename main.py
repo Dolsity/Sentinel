@@ -3,7 +3,7 @@ from nextcord.ext import commands
 import os
 from dotenv import load_dotenv
 import fnmatch
-from utils.config import prefix
+from utils.config import prefix, main_guild
 
 
 class Bot(commands.Bot):
@@ -15,7 +15,10 @@ class Bot(commands.Bot):
     async def process_commands(self, message):
         if not self.is_ready():
             return
-
+        
+        if message.author.dm_channel:
+            return
+        
         ctx = await self.get_context(message, cls=commands.Context)
 
         if ctx.command is not None:
@@ -25,7 +28,7 @@ class Bot(commands.Bot):
     async def on_ready(self):
         print(f"Logged in as {self.user.name} - {self.user.id}")
         await self.change_presence(
-            status=nextcord.Status.dnd, activity=nextcord.Activity(type=nextcord.ActivityType.watching, name=f"{len(list(self.get_all_members()))} Users")
+            status=nextcord.Status.online, activity=nextcord.Activity(type=nextcord.ActivityType.watching, name=f"{len(list(self.get_all_members()))} Users")
         )
 
 intents = nextcord.Intents.default()
