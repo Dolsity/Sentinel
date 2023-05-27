@@ -6,6 +6,8 @@ import os
 load_dotenv()
 get_fora_database = MongoClient(os.getenv('MONGO_URI'))['Fora']
 blacklist = get_fora_database["blacklist"]
+approved_profile_banner = get_fora_database["approved_profile_banner"]
+pending_profile_banner = get_fora_database["pending_profile_banner"]
 get_sentinel_database = MongoClient(os.getenv('MONGO_URI'))['Sentinel']
 warnings = get_sentinel_database["warnings"]
 kicks = get_sentinel_database["kicks"]
