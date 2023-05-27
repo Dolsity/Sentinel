@@ -106,6 +106,7 @@ class Fora(commands.Cog, name="Fora", description="Fora Moderation Commands"):
 
     @commands.command(name="approveimage", aliases=["approveimg"])
     async def command_approveimage(self, interaction : Interaction, user : nextcord.Member = None):
+        """Approve a user's profile banner"""
         await interaction.trigger_typing()
 
         if interaction.author.id not in owner_id:
