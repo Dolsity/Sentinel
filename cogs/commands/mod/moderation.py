@@ -3,7 +3,7 @@ import nextcord
 from nextcord import Interaction
 import datetime
 from utils.config import embed_color, embed_error_color, owner_id
-from utils.database import warnings
+from utils.database import warnings, pending_profile_banner, approved_profile_banner
 
 
 class Moderation(commands.Cog, name="Moderation", description="Moderation Commands"):
@@ -213,7 +213,102 @@ class Moderation(commands.Cog, name="Moderation", description="Moderation Comman
         )
         await interaction.send(embed=embed)
 
-    
+
+    @commands.command(name="removewarning", aliases=["removewarn"])
+    async def command_removewarn(self, interaction : Interaction, user : nextcord.Member = None, num : int = None):
+        """Remove a warning from a user"""
+        await interaction.trigger_typing()
+
+        if interaction.author.id not in owner_id:
+            embed = nextcord.Embed(
+                title=":x: Error", description="You're not the owner of this bot.", color=embed_error_color
+            )
+            await interaction.send(embed=embed)
+            return
+        
+        if user is None:
+            embed = nextcord.Embed(
+                title=":x: Error", description="Please specify a user to remove a warning from.", color=embed_error_color
+            )
+            await interaction.send(embed=embed)
+            return
+        
+        if num is None:
+            embed = nextcord.Embed(
+                title=":x: Error", description="Please specify a warning to remove.", color=embed_error_color
+            )
+            await interaction.send(embed=embed)
+            return
+        
+        warn_data = warnings.find_one({"_id": user.id})
+        if warn_data is None:
+            embed = nextcord.Embed(
+                title=":x: Error", description=f"{user.mention} has no warnings.", color=embed_error_color
+            )
+            await interaction.send(embed=embed)
+            return
+        
+        if num > len(warn_data["author_id"]):
+            embed = nextcord.Embed(
+                title=":x: Error", description=f"{user.mention} has no warning #{num}.", color=embed_error_color
+            )
+            await interaction.send(embed=embed)
+            return
+        
+        # Remove warning, but make sure it removes only that warning and not all of them, but Write it in one string
+        warn_data["author_id"].pop(num - 1)
+        warn_data["time"].pop(num - 1)
+        warn_data["reason"].pop(num - 1)
+        warn_data["warn_points"] -= 1
+
+        warnings.update_one({"_id": user.id}, {"$set": warn_data})
+
+        embed = nextcord.Embed(
+            title=":white_check_mark: Success", description=f"Removed warning #{num} from {user.mention}.", color=embed_color
+        )
+        await interaction.send(embed=embed)
+
+
+    @commands.command(name="approveimage", aliases=["approveimg"])
+    async def command_approveimage(self, interaction : Interaction, user : nextcord.Member = None):
+        await interaction.trigger_typing()
+
+        if interaction.author.id not in owner_id:
+            embed = nextcord.Embed(
+                title=":x: Error", description="You're not the owner of this bot.", color=embed_error_color
+            )
+            await interaction.send(embed=embed)
+            return
+        
+        if user is None:
+            embed = nextcord.Embed(
+                title=":x: Error", description="Please specify a user to approve their image.", color=embed_error_color
+            )
+            await interaction.send(embed=embed)
+            return
+        
+        if pending_profile_banner.find_one({"_id": user.id}) is None:
+            embed = nextcord.Embed(
+                title=":x: Error", description=f"{user.mention} doesn't have a pending image.", color=embed_error_color
+            )
+            await interaction.send(embed=embed)
+            return
+        
+        if approved_profile_banner.find_one({"_id": user.id}) is not None:
+            approved_profile_banner.update_one(
+                {"_id": user.id}, {"$set": {"image_url": pending_profile_banner.find_one({"_id": user.id})["image_url"]}}
+            )
+        else:
+            approved_profile_banner.insert_one(
+                {"_id": user.id, "image_url": pending_profile_banner.find_one({"_id": user.id})["image_url"]}
+            )
+
+        pending_profile_banner.delete_one({"_id": user.id})
+
+        embed = nextcord.Embed(
+            title=":white_check_mark: Success", description=f"Approved {user.mention}'s image.", color=embed_color
+        )
+        await interaction.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Moderation(bot))
