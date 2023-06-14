@@ -218,7 +218,7 @@ class Logging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_user_update(self, before: nextcord.User, after: nextcord.User):
-        if before.name == after.name and before.discriminator == after.discriminator:
+        if before.name == after.name:
             return
 
         guild = self.bot.get_guild(main_guild)
