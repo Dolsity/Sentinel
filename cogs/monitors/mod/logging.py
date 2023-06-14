@@ -123,7 +123,7 @@ class Logging(commands.Cog):
         embed = nextcord.Embed(title="Message Updated")
         embed.color = nextcord.Color.orange()
         embed.set_thumbnail(url=before.author.display_avatar)
-        embed.add_field(name="User", value=f'{before.author} ({before.author.mention})', inline=False)
+        embed.add_field(name="User", value=f'{before.author.name} ({before.author.mention})', inline=False)
 
         before_content = before.content
         if len(before.content) > 400:
@@ -159,12 +159,12 @@ class Logging(commands.Cog):
         embed = nextcord.Embed(title="Message Deleted")
         embed.color = nextcord.Color.red()
         embed.set_thumbnail(url=message.author.display_avatar)
-        embed.add_field(name="User", value=f'{message.author} ({message.author.mention})', inline=True)
+        embed.add_field(name="User", value=f'{message.author.name} ({message.author.mention})', inline=True)
         embed.add_field(name="Channel", value=message.channel.mention, inline=True)
         content = message.content
         async for action in message.guild.audit_logs(limit=1, action=nextcord.AuditLogAction.message_delete):
             if action.target.id == message.author.id:
-                embed.add_field(name="Deleted by", value=f'{action.user} ({action.user.mention})', inline=True)
+                embed.add_field(name="Deleted by", value=f'{action.user.name} ({action.user.mention})', inline=True)
 
         if len(message.content) > 400:
             content = content[0:400] + "..."
@@ -187,9 +187,9 @@ class Logging(commands.Cog):
         channel = messages[0].guild.get_channel(logging_channel)
         output = BytesIO()
         for message in messages:
-            members.add(message.author)
+            members.add(message.author.name)
 
-            string = f'{message.author} ({message.author.id}) [{message.created_at.strftime("%B %d, %Y, %I:%M %p")}]) UTC\n'
+            string = f'{message.author.name} ({message.author.id}) [{message.created_at.strftime("%B %d, %Y, %I:%M %p")}]) UTC\n'
             string += message.content
             for attachment in message.attachments:
                 string += f'\n{attachment.url}'
@@ -263,7 +263,7 @@ class Logging(commands.Cog):
         embed = nextcord.Embed(title="Member Renamed")
         embed.color = nextcord.Color.orange()
         embed.set_thumbnail(url=after.display_avatar)
-        embed.add_field(name="Member", value=f'{after} ({after.mention})', inline=False)
+        embed.add_field(name="Member", value=f'{after.name} ({after.mention})', inline=False)
         embed.add_field(name="Old nickname", value=f'{before.display_name}', inline=True)
         embed.add_field(name="New nickname", value=f'{after.display_name}', inline=True)
         embed.timestamp = datetime.now()
@@ -277,7 +277,7 @@ class Logging(commands.Cog):
         embed = nextcord.Embed(title="Member Avatar Updated")
         embed.color = nextcord.Color.orange()
         embed.set_thumbnail(url=after.display_avatar)
-        embed.add_field(name="Member", value=f'{after} ({after.mention})', inline=False)
+        embed.add_field(name="Member", value=f'{after.name} ({after.mention})', inline=False)
         embed.timestamp = datetime.now()
         embed.set_footer(text=after.id)
 
@@ -295,7 +295,7 @@ class Logging(commands.Cog):
             embed.color = nextcord.Color.red()
 
         embed.set_thumbnail(url=member.display_avatar)
-        embed.add_field(name="Member", value=f'{member} ({member.mention})', inline=True)
+        embed.add_field(name="Member", value=f'{member.name} ({member.mention})', inline=True)
         embed.add_field(name="Role difference", value=', '.join(roles), inline=True)
         embed.timestamp = datetime.now()
         embed.set_footer(text=member.id)
@@ -305,7 +305,7 @@ class Logging(commands.Cog):
             if action.user.id == self.bot.user.id:
                 return
             if action.target.id == member.id:
-                embed.add_field(name="Updated by", value=f'{action.user} ({action.user.mention})', inline=False)
+                embed.add_field(name="Updated by", value=f'{action.user.name} ({action.user.mention})', inline=False)
 
         private = member.guild.get_channel(logging_channel)
         if private:
@@ -325,7 +325,7 @@ class Logging(commands.Cog):
 
         member = after
         embed.set_thumbnail(url=member.display_avatar)
-        embed.add_field(name="Member", value=f'{member} ({member.mention})', inline=True)
+        embed.add_field(name="Member", value=f'{member.name} ({member.mention})', inline=True)
         embed.timestamp = datetime.now()
         embed.set_footer(text=member.id)
         private = member.guild.get_channel(logging_channel)
@@ -342,7 +342,7 @@ class Logging(commands.Cog):
 
         embed = nextcord.Embed(title="Member Banned")
         embed.color = nextcord.Color.red()
-        embed.add_field(name="User", value=f'{user} ({user.mention})', inline=True)
+        embed.add_field(name="User", value=f'{user.name} ({user.mention})', inline=True)
         embed.timestamp = datetime.now()
         embed.set_footer(text=user.id)
 
@@ -368,13 +368,13 @@ class Logging(commands.Cog):
         embed = nextcord.Embed(title="User Unbanned")
         embed.color = nextcord.Color.yellow()
         embed.add_field(
-            name="User", value=f'{user} ({user.mention})', inline=True)
+            name="User", value=f'{user.name} ({user.mention})', inline=True)
         embed.timestamp = datetime.now()
         embed.set_footer(text=user.id)
 
         async for action in guild.audit_logs(limit=1, action=nextcord.AuditLogAction.unban):
             if action.target.id == user.id:
-                embed.add_field(name="Unbanned by", value=f'{action.user} ({action.user.mention})', inline=True)
+                embed.add_field(name="Unbanned by", value=f'{action.user.name} ({action.user.mention})', inline=True)
                 await channel.send(embed=embed)
                 return
 
@@ -383,8 +383,8 @@ class Logging(commands.Cog):
     async def on_member_kick(self, action: nextcord.AuditLogEntry, channel: nextcord.TextChannel):
         embed = nextcord.Embed(title="Member Left")
         embed.color = nextcord.Color.purple()
-        embed.add_field(name="User", value=f'{action.target} ({action.target.mention})', inline=True)
-        embed.add_field(name="Kicked by", value=f'{action.user} ({action.user.mention})', inline=True)
+        embed.add_field(name="User", value=f'{action.target.name} ({action.target.mention})', inline=True)
+        embed.add_field(name="Kicked by", value=f'{action.user.name} ({action.user.mention})', inline=True)
         embed.timestamp = datetime.now()
         embed.set_footer(text=action.user.id)
         await channel.send(embed=embed)
@@ -398,7 +398,7 @@ class Logging(commands.Cog):
         embed = nextcord.Embed()
         embed.color = nextcord.Color.dark_blue()
         embed.set_thumbnail(url=member.display_avatar)
-        embed.add_field(name="Member", value=f'{member} ({member.mention})', inline=False)
+        embed.add_field(name="Member", value=f'{member.name} ({member.mention})', inline=False)
 
         if before.channel is None and member in after.channel.members:
             embed.title = "Member VC Joined"
@@ -447,7 +447,7 @@ class Logging(commands.Cog):
         embed = nextcord.Embed(title="Member Used Command",color=nextcord.Color.dark_teal())
         embed.set_thumbnail(url=interaction.user.display_avatar)
         embed.add_field(
-            name="Member", value=f'{interaction.user} ({interaction.user.mention})', inline=True)
+            name="Member", value=f'{interaction.user.name} ({interaction.user.mention})', inline=True)
         if interaction.channel is not None:
             embed.add_field(name="Channel", value=interaction.channel.mention, inline=True)
         embed.add_field(
