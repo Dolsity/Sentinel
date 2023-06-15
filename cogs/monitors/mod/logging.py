@@ -169,6 +169,8 @@ class Logging(commands.Cog):
         if len(message.content) > 400:
             content = content[0:400] + "..."
         embed.add_field(name="Message", value=content, inline=False)
+        if message.attachments:
+            embed.set_image(url=message.attachments[0].url)
 
         embed.set_footer(text=message.author.id)
         embed.timestamp = datetime.now()
