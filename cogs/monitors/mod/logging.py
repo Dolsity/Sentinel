@@ -106,6 +106,8 @@ class Logging(commands.Cog):
         embed.timestamp = datetime.now()
         embed.set_footer(text=member.id)
         await channel.send(embed=embed)
+        channel = member.guild.get_channel(1110823809587617833)
+        await channel.send(f"**{member.name}** left the server.")
 
 
     @commands.Cog.listener()
